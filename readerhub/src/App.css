@@ -5,18 +5,6 @@ body {
   padding-top: 4%;
 }
 
-.custom-h1 {
-  font-family: "Barlow", sans-serif;
-  font-size: 30px;
-  font-weight:bold;
-  color: #4056a1;
-  text-align: left;
-}
-
-.App {
-  text-align: center;
-}
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
