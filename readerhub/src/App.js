@@ -1,5 +1,5 @@
 import './App.css';
-import React, {useState} from "react"
+import React, {useState, useEffect} from "react"
 import AppBar from '@mui/material/AppBar';
 import { Button, Header, Menu, Box } from '@mui/material';
 import { MenuItem } from '@mui/material';
@@ -11,10 +11,11 @@ import { FormControl, FormLabel } from '@mui/material';
 function NewEntry({ setShowEntryForm }) {
   return (
     <Box>
-         <AppBar position="static" sx={{ backgroundColor: '#374785', width: '100%', height: '10%' }}>
+         <AppBar position="static" sx={{ backgroundColor: '#374785', width: '100%', height: '10%', justifyContent: 'space-between' }}>
         <Typography variant="h1" component="div" sx={{ fontSize: '30px', color: '#fffeed', paddingTop: '10px', paddingLeft: '20px'}}>
           Add A Book
         </Typography>
+        <MenuItem sx={{color: 'cream'}}>X</MenuItem>
       </AppBar>
         <FormControl sx={{ width: '100%', padding: '20px' }}>
         <Grid container spacing={3}>
@@ -72,6 +73,7 @@ function App() {
       </Toolbar>
       </AppBar>
       <div className="reader-home">
+      <Typography sx={{fontSize: '20px', color:'red'}}>Your Entries</Typography>
       <Button
         sx = {{variant: 'contained', backgroundColor:'#374785', color:'#fffeed'}}
         onClick={toggleDrawer(true)}>
