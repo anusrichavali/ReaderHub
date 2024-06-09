@@ -90,6 +90,7 @@ function NewEntry({ setShowEntryForm }) {
 }
 
 function App() {
+  const [entries, setEntries] = useState([]);
   const [showEntryForm, setShowEntryForm] = useState(false);
 
   const toggleDrawer = (open) => (event) => {
@@ -99,32 +100,61 @@ function App() {
     setShowEntryForm(open);
   };
 
+  const fetchEntries = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/');
+      const data = await response.json();
+      setEntries(data);
+    } catch (error) {
+      console.error('Error fetching entries:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEntries();
+  }, []);
+
   return (
     <div className="body">
       <AppBar sx={{ backgroundColor: '#374785'}}>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h1" component="div" sx={{ fontSize: '30px', color: '#fffeed'}}>
-          ReaderHub
-        </Typography>
-        <div style={{ display: 'flex', gap: '20px' }}>
-          <MenuItem sx={{ color: 'cream' }}>Home</MenuItem>
-          <MenuItem sx={{ color: 'cream' }}>Profile</MenuItem>
-        </div>
-      </Toolbar>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h1" component="div" sx={{ fontSize: '30px', color: '#fffeed'}}>
+            ReaderHub
+          </Typography>
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <MenuItem sx={{ color: 'cream' }}>Home</MenuItem>
+            <MenuItem sx={{ color: 'cream' }}>Profile</MenuItem>
+          </div>
+        </Toolbar>
       </AppBar>
       <div className="reader-home">
-      <Typography sx={{fontSize: '20px', color:'red'}}>Your Entries</Typography>
-      <Button
-        sx = {{variant: 'contained', backgroundColor:'#374785', color:'#fffeed'}}
-        onClick={toggleDrawer(true)}>
-        + New Entry
-      </Button>
+        <Typography sx={{fontSize: '20px', color:'red'}}>Your Entries</Typography>
+        <Button
+          sx = {{variant: 'contained', backgroundColor:'#374785', color:'#fffeed'}}
+          onClick={toggleDrawer(true)}>
+          + New Entry
+        </Button>
       </div>
       <Drawer anchor="right" open={showEntryForm} onClose={toggleDrawer(false)}>
-        <NewEntry setShowEntryForm={setShowEntryForm}/>
+        <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} />
       </Drawer>
+      <Box sx={{ padding: '20px' }}>
+        <Grid container spacing={2}>
+          {entries.map((entry) => (
+            <Grid item xs={12} key={entry.id}>
+              <Box sx={{ border: '1px solid #ccc', padding: '10px', borderRadius: '4px' }}>
+                <Typography variant="h6">{entry.title}</Typography>
+                <Typography variant="body1">Author: {entry.author}</Typography>
+                <Typography variant="body1">Genre: {entry.genre}</Typography>
+                <Typography variant="body2">Notes: {entry.notes}</Typography>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </div>
   );
 }
+
 
 export default App;

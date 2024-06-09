@@ -3,8 +3,10 @@ const bodyParser = require('body-parser');
 const db = require('./database'); // Import the database connection
 const app = express();
 const port = 3000;
+const cors = require('cors')
 
 app.use(bodyParser.json());
+app.use(cors());
 
 // API endpoint to handle form submissions
 app.post('/api/entries', (req, res) => {
@@ -32,9 +34,24 @@ app.post('/api/entries', (req, res) => {
       }
     });
   });
+
+//API endpoint to show all reader entries
+app.get('/', (req, res) => {
+    const fetch = 'Select * from entries';
+    db.all(fetch, [], (err, rows) => {
+    if (err) {
+        console.error('Error fetching entries:', err.message);
+        return res.status(500).json({ message: 'Error fetching entries' });
+    } else {
+        res.status(200).json(rows);
+    }
+    });
+})
+
 app.listen(port, () => {
-  console.log(`Server is running on port number ${port}`);
-});
+    console.log(`Server is running on port number ${port}`);
+  });
+  
 
 // Close the database connection when the application is exiting
 process.on('SIGINT', () => {
