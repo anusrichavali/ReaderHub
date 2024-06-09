@@ -79,10 +79,10 @@ function NewEntry({ setShowEntryForm }) {
               </Box>
             </Grid>
             <Grid item xs={12}></Grid>
-            <Box sx={{ paddingTop: '30px', paddingRight: '40px' , paddingLeft: '50px'}}>
-              <Button onClick={handleSubmit}>Submit</Button>
-            </Box>
-          </Grid>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
+                <Button sx={{ backgroundColor: '#374785', color: '#fffeed', width: '100px' }} onClick={handleSubmit}>Submit</Button>
+              </Box>
+            </Grid>
         </FormControl>
       </form>
     </Box>
@@ -128,21 +128,21 @@ function App() {
         </Toolbar>
       </AppBar>
       <div className="reader-home">
-        <Typography sx={{fontSize: '20px', color:'red'}}>Your Entries</Typography>
-        <Button
-          sx = {{variant: 'contained', backgroundColor:'#374785', color:'#fffeed'}}
-          onClick={toggleDrawer(true)}>
-          + New Entry
-        </Button>
       </div>
       <Drawer anchor="right" open={showEntryForm} onClose={toggleDrawer(false)}>
         <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} />
       </Drawer>
+      <Box className="reader-home" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
+        <Typography sx={{ fontSize: '30px', color: '#AA336A', paddingTop: '10px' }}>What You've Read</Typography>
+        <Button sx={{ backgroundColor: '#374785', color: '#fffeed'}} onClick={toggleDrawer(true)}>
+          + New Entry
+        </Button>
+      </Box>
       <Box sx={{ padding: '20px' }}>
         <Grid container spacing={2}>
           {entries.map((entry) => (
             <Grid item xs={12} key={entry.id}>
-              <Box sx={{ border: '1px solid #ccc', padding: '10px', borderRadius: '4px' }}>
+              <Box sx={{ border: '1px solid #ccc', padding: '8px', borderRadius: '4px' }}>
                 <Typography variant="h6">{entry.title}</Typography>
                 <Typography variant="body1">Author: {entry.author}</Typography>
                 <Typography variant="body1">Genre: {entry.genre}</Typography>
