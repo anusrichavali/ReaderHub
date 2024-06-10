@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import { Input, TextField, Drawer, Grid } from '@mui/material';
 import { FormControl, FormLabel } from '@mui/material';
 
-function NewEntry({ setShowEntryForm }) {
+function NewEntry({ setShowEntryForm, fetchEntries }) {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [genre, setGenre] = useState('');
@@ -34,6 +34,7 @@ function NewEntry({ setShowEntryForm }) {
       if (response.ok) {
         setShowEntryForm(false);
         console.log("Success");
+        fetchEntries();
       } else {
         console.error('Failed to submit entry');
       }
@@ -139,10 +140,10 @@ function App() {
         </Button>
       </Box>
       <Box sx={{ padding: '20px' }}>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} className='scrollable-container'>
           {entries.map((entry) => (
             <Grid item xs={12} key={entry.id}>
-              <Box sx={{ border: '1px solid #ccc', padding: '8px', borderRadius: '4px' }}>
+              <Box sx={{ border: '1px solid #ccc', padding: '8px', borderRadius: '4px', backgroundColor: '#e3e7ff' }}>
                 <Typography variant="h6">{entry.title}</Typography>
                 <Typography variant="body1">Author: {entry.author}</Typography>
                 <Typography variant="body1">Genre: {entry.genre}</Typography>
@@ -155,6 +156,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;
