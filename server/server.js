@@ -48,6 +48,24 @@ app.get('/', (req, res) => {
     });
 })
 
+app.delete('/delete/:id', (req, res) => {
+    const { id } = req.params;
+    const del = 'Delete from entries where id = ?'
+
+    db.run(del, id, function(err) {
+        if(err) {
+            console.error("Error deleting entry", err.message);
+            return res.status(500).json({ message: 'Error deleting entry' });
+        } else if (this.changes === 0) {
+            return res.status(404).json({ message: 'Entry not found' });
+        } else 
+        {
+            console.log("Successfully deleted entry");
+            return res.status(200).json({message: 'Successfully deleted entry'});
+        }
+    });
+}) 
+
 app.listen(port, () => {
     console.log(`Server is running on port number ${port}`);
   });

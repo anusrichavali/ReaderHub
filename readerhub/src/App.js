@@ -111,6 +111,21 @@ function App() {
     }
   };
 
+  const deleteEntry = async(id) => {
+    try {
+      const response = await fetch(`http://localhost:3000/delete/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        fetchEntries();
+      } else {
+        console.error("Successfully deleted entry");
+      }
+    } catch (error) {
+      console.error ("Error:", error);
+    }
+  }
+
   useEffect(() => {
     fetchEntries();
   }, []);
@@ -148,6 +163,7 @@ function App() {
                 <Typography variant="body1">Author: {entry.author}</Typography>
                 <Typography variant="body1">Genre: {entry.genre}</Typography>
                 <Typography variant="body2">Notes: {entry.notes}</Typography>
+                <Button onClick={() => deleteEntry(entry.id)}>delete</Button>
               </Box>
             </Grid>
           ))}
