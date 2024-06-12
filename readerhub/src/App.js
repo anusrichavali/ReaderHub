@@ -1,12 +1,14 @@
 import './App.css';
 import React, {useState, useEffect} from "react"
 import AppBar from '@mui/material/AppBar';
-import {Header, Menu, Box, Button} from '@mui/material';
+import {Header, Menu, Box, Button, IconButton} from '@mui/material';
 import { MenuItem } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Input, TextField, Drawer, Grid } from '@mui/material';
+import { Input, TextField, Drawer, Grid, iconButtonClasses } from '@mui/material';
 import { FormControl, FormLabel } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 function NewEntry({ setShowEntryForm, fetchEntries }) {
   const [title, setTitle] = useState('');
@@ -154,16 +156,23 @@ function App() {
           + New Entry
         </Button>
       </Box>
-      <Box sx={{ padding: '20px' }}>
+      <Box sx={{ padding: '10px' }}>
         <Grid container spacing={2} className='scrollable-container'>
           {entries.map((entry) => (
-            <Grid item xs={12} key={entry.id}>
-              <Box sx={{ border: '1px solid #ccc', padding: '8px', borderRadius: '4px', backgroundColor: '#e3e7ff' }}>
-                <Typography variant="h6">{entry.title}</Typography>
-                <Typography variant="body1">Author: {entry.author}</Typography>
-                <Typography variant="body1">Genre: {entry.genre}</Typography>
-                <Typography variant="body2">Notes: {entry.notes}</Typography>
-                <Button onClick={() => deleteEntry(entry.id)}>delete</Button>
+            <Grid item xs={6} key={entry.id}>
+              <Box sx={{ border: '1px solid #ccc', padding: '3px', borderRadius: '4px', backgroundColor: '#e3e7ff', display: 'flex' }}>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6">{entry.title}</Typography>
+                  <Typography variant="body1">Author: {entry.author}</Typography>
+                  <Typography variant="body1">Genre: {entry.genre}</Typography>
+                  <Typography variant="body2">Notes: {entry.notes}</Typography>
+                </Box>
+                <IconButton onClick={() => deleteEntry(entry.id)}>
+                  <DeleteIcon></DeleteIcon>
+                </IconButton>
+                <IconButton>
+                  <EditIcon></EditIcon>
+                </IconButton>
               </Box>
             </Grid>
           ))}

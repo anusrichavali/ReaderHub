@@ -3,7 +3,6 @@
 }
 
 .scrollable-container {
-  height: 400px; /* Set the height to your preference */
   overflow: auto;
 }
 
