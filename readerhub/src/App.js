@@ -1,7 +1,7 @@
 import './App.css';
-import React, {useState, useEffect} from "react"
+import React, { useState, useEffect } from "react"
 import AppBar from '@mui/material/AppBar';
-import {Header, Menu, Box, Button, IconButton} from '@mui/material';
+import { Header, Menu, Box, Button, IconButton } from '@mui/material';
 import { MenuItem } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -10,23 +10,43 @@ import { FormControl, FormLabel } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-function NewEntry({ setShowEntryForm, fetchEntries }) {
+function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [genre, setGenre] = useState('');
   const [notes, setNotes] = useState('');
 
+  useEffect(() => {
+    if (currentEntry) {
+      setTitle(currentEntry.title);
+      setAuthor(currentEntry.author);
+      setGenre(currentEntry.genre);
+      setNotes(currentEntry.notes);
+    }
+  }, [currentEntry]);
+
   console.log('Rendering NewEntry component'); // Debug log to ensure component is rendering
 
-  const handleSubmit = async(event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission behavior
     console.log('handleSubmit called'); // Debug log to verify function is called
     const entry = { title, author, genre, notes };
     console.log('Submitting entry:', entry); // Log the entry data
 
     try {
-      const response = await fetch('http://localhost:3000/api/entries', {
-        method: 'POST',
+      let url;
+      let method;
+
+      if (currentEntry) {
+        url = `http://localhost:3000/api/entries/${currentEntry.id}`;
+        method = 'PUT';
+      } else {
+        url = 'http://localhost:3000/api/entries';
+        method = 'POST';
+      }
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -49,7 +69,7 @@ function NewEntry({ setShowEntryForm, fetchEntries }) {
     <Box>
       <AppBar position="static" sx={{ backgroundColor: '#374785', width: '100%', height: '10%', justifyContent: 'space-between', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <Typography variant="h1" component="div" sx={{ fontSize: '30px', color: '#fffeed', paddingTop: '10px', paddingLeft: '20px' }}>
-          Add A Book
+          {currentEntry ? 'Edit Book' : 'Add A Book'}
         </Typography>
         <Box sx={{ flexGrow: 1 }}></Box> {/* This will push the MenuItem to the right */}
         <MenuItem sx={{ color: 'cream' }} onClick={() => setShowEntryForm(false)}>X</MenuItem>
@@ -82,10 +102,10 @@ function NewEntry({ setShowEntryForm, fetchEntries }) {
               </Box>
             </Grid>
             <Grid item xs={12}></Grid>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
-                <Button sx={{ backgroundColor: '#374785', color: '#fffeed', width: '100px' }} onClick={handleSubmit}>Submit</Button>
-              </Box>
-            </Grid>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
+              <Button sx={{ backgroundColor: '#374785', color: '#fffeed', width: '100px' }} type="submit">Submit</Button>
+            </Box>
+          </Grid>
         </FormControl>
       </form>
     </Box>
@@ -95,11 +115,9 @@ function NewEntry({ setShowEntryForm, fetchEntries }) {
 function App() {
   const [entries, setEntries] = useState([]);
   const [showEntryForm, setShowEntryForm] = useState(false);
+  const [currentEntry, setCurrentEntry] = useState(null);
 
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
+  const toggleDrawer = (open) => () => {
     setShowEntryForm(open);
   };
 
@@ -113,7 +131,7 @@ function App() {
     }
   };
 
-  const deleteEntry = async(id) => {
+  const deleteEntry = async (id) => {
     try {
       const response = await fetch(`http://localhost:3000/delete/${id}`, {
         method: 'DELETE',
@@ -121,12 +139,17 @@ function App() {
       if (response.ok) {
         fetchEntries();
       } else {
-        console.error("Successfully deleted entry");
+        console.error("Failed to delete entry");
       }
     } catch (error) {
-      console.error ("Error:", error);
+      console.error("Error:", error);
     }
   }
+
+  const editEntry = (entry) => {
+    setCurrentEntry(entry);
+    setShowEntryForm(true);
+  };
 
   useEffect(() => {
     fetchEntries();
@@ -148,11 +171,11 @@ function App() {
       <div className="reader-home">
       </div>
       <Drawer anchor="right" open={showEntryForm} onClose={toggleDrawer(false)}>
-        <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} />
+        <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} currentEntry={currentEntry} />
       </Drawer>
       <Box className="reader-home" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
         <Typography sx={{ fontSize: '30px', color: '#AA336A', paddingTop: '10px' }}>What You've Read</Typography>
-        <Button sx={{ backgroundColor: '#374785', color: '#fffeed'}} onClick={toggleDrawer(true)}>
+        <Button sx={{ backgroundColor: '#374785', color: '#fffeed' }} onClick={() => { setCurrentEntry(null); setShowEntryForm(true); }}>
           + New Entry
         </Button>
       </Box>
@@ -170,7 +193,7 @@ function App() {
                 <IconButton onClick={() => deleteEntry(entry.id)}>
                   <DeleteIcon></DeleteIcon>
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={() => editEntry(entry)}>
                   <EditIcon></EditIcon>
                 </IconButton>
               </Box>

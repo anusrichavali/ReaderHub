@@ -66,6 +66,22 @@ app.delete('/delete/:id', (req, res) => {
     });
 }) 
 
+app.put('/api/entries/:id', (req, res) => {
+    const { id } = req.params;
+    const { title, author, genre, notes } = req.body;
+    const sql = 'UPDATE entries SET title = ?, author = ?, genre = ?, notes = ? WHERE id = ?';
+    
+    db.run(sql, [title, author, genre, notes, id], function (err) {
+      if (err) {
+        console.error('Error updating entry:', err.message);
+        return res.status(500).json({ message: 'Error updating entry' });
+      } else {
+        console.log('Entry successfully updated:', this.changes);
+        res.status(200).json({ id: this.changes, message: 'Entry successfully updated' });
+      }
+    });
+  });
+
 app.listen(port, () => {
     console.log(`Server is running on port number ${port}`);
   });
