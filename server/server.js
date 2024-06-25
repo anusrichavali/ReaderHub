@@ -10,16 +10,16 @@ app.use(cors());
 
 // API endpoint to handle form submissions
 app.post('/api/entries', (req, res) => {
-    const { title, author, genre, notes } = req.body;
+    const { title, author, genre, notes, rating } = req.body;
   
     // Validation (optional, but recommended)
-    if (!title || !author || !genre || !notes) {
-      console.error('Validation failed:', { title, author, genre, notes });
+    if (!title || !author || !genre || !notes || !rating) {
+      console.error('Validation failed:', { title, author, genre, notes, rating});
       return res.status(400).json({ message: 'All fields are required.' });
     }
   
-    const stmt = db.prepare(`INSERT INTO entries (title, author, genre, notes) VALUES (?, ?, ?, ?)`);
-    stmt.run(title, author, genre, notes, function (err) {
+    const stmt = db.prepare(`INSERT INTO entries (title, author, genre, notes, rating) VALUES (?, ?, ?, ?, ?)`);
+    stmt.run(title, author, genre, notes, rating, function (err) {
       if (err) {
         console.error('Error inserting entry into the database:', err.message);
         return res.status(500).json({ message: 'Error inserting entry into the database' });
@@ -68,10 +68,10 @@ app.delete('/delete/:id', (req, res) => {
 
 app.put('/api/entries/:id', (req, res) => {
     const { id } = req.params;
-    const { title, author, genre, notes } = req.body;
-    const sql = 'UPDATE entries SET title = ?, author = ?, genre = ?, notes = ? WHERE id = ?';
+    const { title, author, genre, notes, rating } = req.body;
+    const sql = 'UPDATE entries SET title = ?, author = ?, genre = ?, notes = ?, rating = ? WHERE id = ?';
     
-    db.run(sql, [title, author, genre, notes, id], function (err) {
+    db.run(sql, [title, author, genre, notes, rating, id], function (err) {
       if (err) {
         console.error('Error updating entry:', err.message);
         return res.status(500).json({ message: 'Error updating entry' });

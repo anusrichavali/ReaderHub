@@ -14,6 +14,7 @@ db.run(`CREATE TABLE IF NOT EXISTS entries (
     title VARCHAR(200) NOT NULL,
     author VARCHAR(300) NOT NULL,
     genre VARCHAR(300) NOT NULL,
+    rating INTEGER NOT NULL,
     notes VARCHAR(10000) NOT NULL
 )`, (err) => {
     if (err) {
