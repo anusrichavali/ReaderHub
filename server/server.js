@@ -11,6 +11,7 @@ app.use(cors());
 // API endpoint to handle form submissions
 app.post('/api/entries', (req, res) => {
     const { title, author, genre, notes, rating } = req.body;
+    const currentDate = new Date().toISOString().split('T')[0];
   
     // Validation (optional, but recommended)
     if (!title || !author || !genre || !notes || !rating) {
@@ -18,8 +19,8 @@ app.post('/api/entries', (req, res) => {
       return res.status(400).json({ message: 'All fields are required.' });
     }
   
-    const stmt = db.prepare(`INSERT INTO entries (title, author, genre, notes, rating) VALUES (?, ?, ?, ?, ?)`);
-    stmt.run(title, author, genre, notes, rating, function (err) {
+    const stmt = db.prepare(`INSERT INTO entries (title, author, genre, notes, rating, date) VALUES (?, ?, ?, ?, ?, ?)`);
+    stmt.run(title, author, genre, notes, rating, currentDate, function (err) {
       if (err) {
         console.error('Error inserting entry into the database:', err.message);
         return res.status(500).json({ message: 'Error inserting entry into the database' });

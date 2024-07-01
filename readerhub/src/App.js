@@ -1,20 +1,26 @@
 import './App.css';
 import React, { useState, useEffect } from "react"
 import AppBar from '@mui/material/AppBar';
-import { Header, Menu, Box, Button, IconButton } from '@mui/material';
-import { MenuItem } from '@mui/material';
+import {Box, Button, IconButton, MenuItem, TextField, Drawer, Grid, FormControl, FormLabel, colors, useColorScheme} from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Input, TextField, Drawer, Grid, iconButtonClasses } from '@mui/material';
-import { FormControl, FormLabel } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import {Chart} from 'react-google-charts';
+import {Select} from '@mui/material';
+import Card from '@mui/material/Card';
+import { BarChart } from '@mui/x-charts/BarChart';
+import {mangoFusionPalette} from '@mui/x-charts/colorPalettes';
+import { legendClasses } from '@mui/x-charts';
+//import { Rating } from '@smastrom/react-rating'
+//import '@smastrom/react-rating/style.css'
 
 function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [genre, setGenre] = useState('');
   const [notes, setNotes] = useState('');
+  const [rating, setRating] = useState(null);
 
   useEffect(() => {
     if (currentEntry) {
@@ -22,6 +28,7 @@ function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
       setAuthor(currentEntry.author);
       setGenre(currentEntry.genre);
       setNotes(currentEntry.notes);
+      setRating(currentEntry.rating);
     }
   }, [currentEntry]);
 
@@ -30,7 +37,7 @@ function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission behavior
     console.log('handleSubmit called'); // Debug log to verify function is called
-    const entry = { title, author, genre, notes };
+    const entry = { title, author, genre, notes, rating };
     console.log('Submitting entry:', entry); // Log the entry data
 
     try {
@@ -101,6 +108,18 @@ function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
                 <TextField fullWidth multiline rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
               </Box>
             </Grid>
+            <Grid item xs={12}>
+              <FormLabel>Rating</FormLabel>
+              <Box sx={{ paddingRight: '40px' }}>
+                <Select fullWidth value={rating} onChange={(e) => setRating(e.target.value)}>
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                </Select>
+              </Box>
+            </Grid>
             <Grid item xs={12}></Grid>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
               <Button sx={{ backgroundColor: '#374785', color: '#fffeed', width: '100px' }} type="submit">Submit</Button>
@@ -151,6 +170,110 @@ function App() {
     setShowEntryForm(true);
   };
 
+  const genreCounts = entries.reduce((acc, entry) => {
+    acc[entry.genre] = (acc[entry.genre] || 0) + 1;
+    return acc;
+  }, {});
+
+  const ratingCounts = entries.reduce((acc, entry) => {
+    acc[entry.rating] = (acc[entry.rating] || 0) + 1;
+    return acc;
+  }, {});
+
+  const dateCounts = entries.reduce((acc, entry) => {
+    acc[entry.date] = (acc[entry.date] || 0) + 1;
+    return acc;
+  }, {});
+
+  const data = [
+    ['Count', 'Genres'],...
+    Object.entries(genreCounts)
+  ];
+
+  const dataRatings = [
+    ['Count', 'Ratings'],...
+    Object.entries(ratingCounts)
+  ];
+
+  const dataDates = [
+    ['Date', 'Entries Per Day'],
+    ...Object.entries(dateCounts).map(([date, count]) => [new Date(date), count])
+  ]
+
+  const optionsGenres = {
+    chartArea: {
+      width: '100%',
+      height: '100%',
+    },
+    colors: ["#D32F2F",
+      "#C2185B",
+      "#0097A7",
+      "#7B1FA2",
+      "#512DA8",
+      "#303F9F",
+      "#1976D2",
+      "#0288D1",
+      "#00796B",
+      "#388E3C",
+      "#AFB42B",
+      "#FFA000"
+    ],
+  };
+
+  const optionsRatings = {
+    hAxis: {
+      title: 'Count',
+      titleTextStyle: {
+        fontSize: 14,
+        bold: true,
+        italic: false,
+      },
+      ticks: Array.from({ length: Math.max(...Object.values(ratingCounts)) + 1 }, (_, i) => i),
+    },
+    vAxis: {
+      title: 'Ratings',
+      titleTextStyle: {
+        fontSize: 14,
+        bold: true,
+        italic: false,
+      },
+    },
+    chartArea: {
+      width: '60%',
+      height: '70%',
+    },
+    bars: 'horizontal',
+    colors: ["#5A5AA5"],
+    legend: {
+      position: 'none'
+    }
+  };
+
+  const optionsDates = {
+    vAxis: {
+      title: 'Entries Per Day',
+      titleTextStyle: {
+        fontSize: 14,
+        bold: true,
+        italic: false,
+      },
+    },
+    hAxis: {
+      title: 'Date',
+      titleTextStyle: {
+        fontSize: 14,
+        bold: true,
+        italic: false,
+      },
+      format: 'yyyy-MM-dd',
+      gridlines: { count: 15 }
+    },
+    chartArea: {
+      width: '70%',
+      height: '60%',
+    },
+  }
+
   useEffect(() => {
     fetchEntries();
   }, []);
@@ -168,8 +291,7 @@ function App() {
           </div>
         </Toolbar>
       </AppBar>
-      <div className="reader-home">
-      </div>
+      <div className="reader-home"></div>
       <Drawer anchor="right" open={showEntryForm} onClose={toggleDrawer(false)}>
         <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} currentEntry={currentEntry} />
       </Drawer>
@@ -179,27 +301,58 @@ function App() {
           + New Entry
         </Button>
       </Box>
-      <Box sx={{ padding: '10px' }}>
-        <Grid container spacing={2} className='scrollable-container'>
-          {entries.map((entry) => (
-            <Grid item xs={6} key={entry.id}>
-              <Box sx={{ border: '1px solid #ccc', padding: '3px', borderRadius: '4px', backgroundColor: '#e3e7ff', display: 'flex' }}>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6">{entry.title}</Typography>
-                  <Typography variant="body1">Author: {entry.author}</Typography>
-                  <Typography variant="body1">Genre: {entry.genre}</Typography>
-                  <Typography variant="body2">Notes: {entry.notes}</Typography>
-                </Box>
-                <IconButton onClick={() => deleteEntry(entry.id)}>
-                  <DeleteIcon></DeleteIcon>
-                </IconButton>
-                <IconButton onClick={() => editEntry(entry)}>
-                  <EditIcon></EditIcon>
-                </IconButton>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
+      <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', padding: '10px' }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
+          <Grid container spacing={2} className='scrollable-container'>
+            {entries.map((entry) => (
+              <Grid item xs={12} key={entry.id}>
+                  <Card sx={{boxShadow: 3, paddingLeft: '20px'}}>
+                    <Typography variant="h6">{entry.title}</Typography>
+                    <Typography variant='body2'>Date of Entry: {entry.date} </Typography>
+                    <Typography variant="body1">Rating: {entry.rating}</Typography>
+                    <Typography variant="body1">Author: {entry.author}</Typography>
+                    <Typography variant="body1">Genre: {entry.genre}</Typography>
+                    <Typography variant="body1">Notes: {entry.notes}</Typography>
+                  <IconButton onClick={() => deleteEntry(entry.id)}>
+                    <DeleteIcon></DeleteIcon>
+                  </IconButton>
+                  <IconButton onClick={() => editEntry(entry)}>
+                    <EditIcon></EditIcon>
+                  </IconButton>
+                  </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+        <Box sx={{flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <Card sx={{padding: '10%'}}>
+          <Chart
+            chartType="PieChart"
+            height='100%'
+            width='100%'
+            data={data}
+            options={optionsGenres}
+          />
+          </Card>
+          <Card sx={{padding: '10%'}}>
+          <Chart
+            chartType="BarChart"
+            width= '100%'
+            height='100%'
+            data={dataRatings}
+            options={optionsRatings}
+          />
+        </Card>
+        <Card sx={{padding: '5%'}}>
+          <Chart
+            chartType="LineChart"
+            width= '100%'
+            height='100%'
+            data={dataDates}
+            options={optionsDates}
+          />
+        </Card>
+        </Box>
       </Box>
     </div>
   );
