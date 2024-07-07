@@ -197,8 +197,8 @@ function App() {
 
   const dataDates = [
     ['Date', 'Entries Per Day'],
-    ...Object.entries(dateCounts).map(([date, count]) => [new Date(date), count])
-  ]
+    ...Object.entries(dateCounts)
+  ];
 
   const optionsGenres = {
     chartArea: {
@@ -296,36 +296,42 @@ function App() {
         <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} currentEntry={currentEntry} />
       </Drawer>
       <Box className="reader-home" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
-        <Typography sx={{ fontSize: '30px', color: '#AA336A', paddingTop: '10px' }}>What You've Read</Typography>
+        <Typography variant="h4"sx={{color: '#CD5B45', paddingTop: '10px' }}>Your Reading Journey</Typography>
         <Button sx={{ backgroundColor: '#374785', color: '#fffeed' }} onClick={() => { setCurrentEntry(null); setShowEntryForm(true); }}>
           + New Entry
         </Button>
       </Box>
       <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', padding: '10px' }}>
-        <Box sx={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', paddingRight: '10px', height: '80vh' }}>
           <Grid container spacing={2} className='scrollable-container'>
             {entries.map((entry) => (
               <Grid item xs={12} key={entry.id}>
                   <Card sx={{boxShadow: 3, paddingLeft: '20px'}}>
-                    <Typography variant="h6">{entry.title}</Typography>
-                    <Typography variant='body2'>Date of Entry: {entry.date} </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="h5" sx={{paddingTop: '10px'}}>{entry.title}</Typography>
+                    <Typography variant='body2' sx={{paddingRight: '10px'}}>Date of Entry: {entry.date}</Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'left', marginTop: '5px' }}>
                     <Typography variant="body1">Rating: {entry.rating}</Typography>
                     <Typography variant="body1">Author: {entry.author}</Typography>
                     <Typography variant="body1">Genre: {entry.genre}</Typography>
                     <Typography variant="body1">Notes: {entry.notes}</Typography>
-                  <IconButton onClick={() => deleteEntry(entry.id)}>
-                    <DeleteIcon></DeleteIcon>
-                  </IconButton>
-                  <IconButton onClick={() => editEntry(entry)}>
-                    <EditIcon></EditIcon>
-                  </IconButton>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                    <IconButton onClick={() => deleteEntry(entry.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                    <IconButton onClick={() => editEntry(entry)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Box>
                   </Card>
               </Grid>
             ))}
           </Grid>
         </Box>
         <Box sx={{flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <Card sx={{padding: '10%'}}>
+        <Card sx={{padding: '5%', flexBasis: '50%' }}>
           <Chart
             chartType="PieChart"
             height='100%'
@@ -334,7 +340,7 @@ function App() {
             options={optionsGenres}
           />
           </Card>
-          <Card sx={{padding: '10%'}}>
+          <Card sx={{padding: '10%', flexBasis: '50%' }}>
           <Chart
             chartType="BarChart"
             width= '100%'
@@ -343,7 +349,7 @@ function App() {
             options={optionsRatings}
           />
         </Card>
-        <Card sx={{padding: '5%'}}>
+        <Card sx={{padding: '5%', flexBasis: '50%' }}>
           <Chart
             chartType="LineChart"
             width= '100%'
