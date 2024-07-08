@@ -308,7 +308,7 @@ function App() {
         <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} currentEntry={currentEntry} />
       </Drawer>
       <Box className="reader-home" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
-        <Typography variant="h5"sx={{color: '#CD5B45', paddingTop: '10px' }}>YOUR READING JOURNEY</Typography>
+        <Typography variant="h4" fontFamily= 'Montserrat, sans-serif'sx={{color: '#2A3847', fontSize: '30px'}}>What You've Been Reading</Typography>
         <Button sx={{ backgroundColor: '#374785', color: '#fffeed' }} onClick={() => { setCurrentEntry(null); setShowEntryForm(true); }}>
           + New Entry
         </Button>

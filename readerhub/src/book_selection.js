@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { TextField, List, ListItem, ListItemText, Box } from '@mui/material';
+import { TextField, List, ListItem, ListItemText, ListItemAvatar, Avatar, Box } from '@mui/material';
 
 const BookSearch = ({ onSelectBook }) => {
   const [query, setQuery] = useState('');
@@ -50,6 +50,12 @@ const BookSearch = ({ onSelectBook }) => {
                 key={book.id}
                 onClick={() => handleBookSelect(book)}
               >
+                <ListItemAvatar>
+                  <Avatar
+                    src={book.volumeInfo.imageLinks?.thumbnail || ''}
+                    alt={book.volumeInfo.title}
+                  />
+                </ListItemAvatar>
                 <ListItemText primary={book.volumeInfo.title} />
               </ListItem>
             ))}
