@@ -16,7 +16,8 @@ db.run(`CREATE TABLE IF NOT EXISTS entries (
     genre VARCHAR(300) NOT NULL,
     rating INTEGER NOT NULL,
     date DATETIME NOT NULL,
-    notes VARCHAR(10000)
+    notes VARCHAR(10000),
+    bookCover VARCHAR(500)
 )`, (err) => {
     if (err) {
         console.error(err.message);

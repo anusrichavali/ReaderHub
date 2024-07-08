@@ -1,19 +1,14 @@
 import './App.css';
 import React, { useState, useEffect } from "react"
 import AppBar from '@mui/material/AppBar';
-import {Box, Button, IconButton, MenuItem, TextField, Drawer, Grid, FormControl, FormLabel, colors, useColorScheme} from '@mui/material';
+import {Box, Button, IconButton, MenuItem, TextField, Drawer, Grid, FormControl, FormLabel, Select } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import {Chart} from 'react-google-charts';
-import {Select} from '@mui/material';
 import Card from '@mui/material/Card';
-import { BarChart } from '@mui/x-charts/BarChart';
-import {mangoFusionPalette} from '@mui/x-charts/colorPalettes';
-import { legendClasses } from '@mui/x-charts';
-//import { Rating } from '@smastrom/react-rating'
-//import '@smastrom/react-rating/style.css'
+import BookSelect from './book_selection';
 
 function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
   const [title, setTitle] = useState('');
@@ -21,6 +16,7 @@ function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
   const [genre, setGenre] = useState('');
   const [notes, setNotes] = useState('');
   const [rating, setRating] = useState(null);
+  const [bookCover, setBookCover] = useState('');
 
   useEffect(() => {
     if (currentEntry) {
@@ -29,16 +25,23 @@ function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
       setGenre(currentEntry.genre);
       setNotes(currentEntry.notes);
       setRating(currentEntry.rating);
+      setBookCover(currentEntry.bookCover);
     }
   }, [currentEntry]);
 
-  console.log('Rendering NewEntry component'); // Debug log to ensure component is rendering
+  console.log('Rendering NewEntry component');
+
+  const handleBookSelect = (book) => {
+    setTitle(book.volumeInfo.title);
+    setAuthor(book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : '');
+    setBookCover(book.volumeInfo.imageLinks?.thumbnail || '');
+  };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission behavior
-    console.log('handleSubmit called'); // Debug log to verify function is called
-    const entry = { title, author, genre, notes, rating };
-    console.log('Submitting entry:', entry); // Log the entry data
+    event.preventDefault();
+    console.log('handleSubmit called'); 
+    const entry = { title, author, genre, notes, rating, bookCover };
+    console.log('Submitting entry:', entry);
 
     try {
       let url;
@@ -78,13 +81,18 @@ function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
         <Typography variant="h1" component="div" sx={{ fontSize: '30px', color: '#fffeed', paddingTop: '10px', paddingLeft: '20px' }}>
           {currentEntry ? 'Edit Book' : 'Add A Book'}
         </Typography>
-        <Box sx={{ flexGrow: 1 }}></Box> {/* This will push the MenuItem to the right */}
+        <Box sx={{ flexGrow: 1 }}></Box>
         <MenuItem sx={{ color: 'cream' }} onClick={() => setShowEntryForm(false)}>X</MenuItem>
       </AppBar>
       <form onSubmit={handleSubmit}>
         <FormControl sx={{ width: '100%', padding: '20px' }}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+          <Grid item xs={12}>
+            <Box sx={{ paddingRight: '40px' }}>
+              <BookSelect onSelectBook={handleBookSelect} />
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
               <FormLabel>Title</FormLabel>
               <Box sx={{ paddingRight: '40px' }}>
                 <TextField fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -120,6 +128,11 @@ function NewEntry({ setShowEntryForm, fetchEntries, currentEntry }) {
                 </Select>
               </Box>
             </Grid>
+            {bookCover && (
+              <Grid item xs={12}>
+                <img src={bookCover} alt="Book Cover" />
+              </Grid>
+            )}
             <Grid item xs={12}></Grid>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
               <Button sx={{ backgroundColor: '#374785', color: '#fffeed', width: '100px' }} type="submit">Submit</Button>
@@ -287,7 +300,6 @@ function App() {
           </Typography>
           <div style={{ display: 'flex', gap: '20px' }}>
             <MenuItem sx={{ color: 'cream' }}>Home</MenuItem>
-            <MenuItem sx={{ color: 'cream' }}>Profile</MenuItem>
           </div>
         </Toolbar>
       </AppBar>
@@ -296,41 +308,46 @@ function App() {
         <NewEntry setShowEntryForm={setShowEntryForm} fetchEntries={fetchEntries} currentEntry={currentEntry} />
       </Drawer>
       <Box className="reader-home" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
-        <Typography variant="h4"sx={{color: '#CD5B45', paddingTop: '10px' }}>Your Reading Journey</Typography>
+        <Typography variant="h5"sx={{color: '#CD5B45', paddingTop: '10px' }}>YOUR READING JOURNEY</Typography>
         <Button sx={{ backgroundColor: '#374785', color: '#fffeed' }} onClick={() => { setCurrentEntry(null); setShowEntryForm(true); }}>
           + New Entry
         </Button>
       </Box>
-      <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', padding: '10px' }}>
-        <Box sx={{ flex: 1, overflowY: 'auto', paddingRight: '10px', height: '80vh' }}>
+      <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', padding: '5px' }}>
+        <Box sx={{flex: 1, overflowY: 'auto', paddingRight: '10px', height: '80vh' }}>
           <Grid container spacing={2} className='scrollable-container'>
-            {entries.map((entry) => (
-              <Grid item xs={12} key={entry.id}>
-                  <Card sx={{boxShadow: 3, paddingLeft: '20px'}}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h5" sx={{paddingTop: '10px'}}>{entry.title}</Typography>
-                    <Typography variant='body2' sx={{paddingRight: '10px'}}>Date of Entry: {entry.date}</Typography>
+          {entries.map((entry) => (
+            <Grid item xs={12} key={entry.id}>
+              <Card key={entry.id} sx={{ marginBottom: '5px', padding: '20px', position: 'relative' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                  {entry.bookCover && (
+                    <img src={entry.bookCover} alt="Book Cover" style={{ width: '100px', height: 'auto', marginRight: '20px' }} />
+                  )}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6">{entry.title}</Typography>
+                    <Typography variant="subtitle1">{entry.author}</Typography>
+                    <Typography variant="body2">Date of Entry: {entry.date}</Typography>
+                    <Typography variant="body2">Genre: {entry.genre}</Typography>
+                    <Box sx={{ marginTop: '5px', marginBottom: '5px', }}>
+                      <Typography variant="body2">Notes: {entry.notes}</Typography>
+                    </Box>
+                    <Typography variant="body2">Rating: {entry.rating}</Typography>
                   </Box>
-                  <Box sx={{ textAlign: 'left', marginTop: '5px' }}>
-                    <Typography variant="body1">Rating: {entry.rating}</Typography>
-                    <Typography variant="body1">Author: {entry.author}</Typography>
-                    <Typography variant="body1">Genre: {entry.genre}</Typography>
-                    <Typography variant="body1">Notes: {entry.notes}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
-                    <IconButton onClick={() => deleteEntry(entry.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                    <IconButton onClick={() => editEntry(entry)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Box>
-                  </Card>
-              </Grid>
-            ))}
+                </Box>
+                <Box sx={{ position: 'absolute', bottom: '10px', right: '10px' }}>
+                  <IconButton onClick={() => deleteEntry(entry.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                  <IconButton onClick={() => editEntry(entry)} sx={{ marginLeft: '10px' }}>
+                    <EditIcon />
+                  </IconButton>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
           </Grid>
         </Box>
-        <Box sx={{flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {entries.length > 0 && (<Box sx={{flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <Card sx={{padding: '5%', flexBasis: '50%' }}>
           <Chart
             chartType="PieChart"
@@ -358,7 +375,7 @@ function App() {
             options={optionsDates}
           />
         </Card>
-        </Box>
+        </Box>)}
       </Box>
     </div>
   );
