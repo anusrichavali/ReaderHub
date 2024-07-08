@@ -3,7 +3,7 @@
 On ReaderHub, you can create journal entries about the books you have read by searching for the title using Google's Books API, and then filling in the entry with your notes about the book. Once you submit your entry, you'll see that entry added to your existing list. 
 You'll also see visualizations about your reading trends, including the breakdown of the genres you've read, the ratings you've given, and your reading activity through time. </p>
 
-- current steps for running
+Current steps for running:
 - download the repository
 - create local database
     - cd server
