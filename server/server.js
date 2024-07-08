@@ -69,10 +69,10 @@ app.delete('/delete/:id', (req, res) => {
 
 app.put('/api/entries/:id', (req, res) => {
     const { id } = req.params;
-    const { title, author, genre, notes, rating } = req.body;
-    const sql = 'UPDATE entries SET title = ?, author = ?, genre = ?, notes = ?, rating = ? WHERE id = ?';
+    const { title, author, genre, notes, rating, bookCover } = req.body;
+    const sql = 'UPDATE entries SET title = ?, author = ?, genre = ?, notes = ?, rating = ?, bookCover = ? WHERE id = ?';
     
-    db.run(sql, [title, author, genre, notes, rating, id], function (err) {
+    db.run(sql, [title, author, genre, notes, rating, bookCover, id], function (err) {
       if (err) {
         console.error('Error updating entry:', err.message);
         return res.status(500).json({ message: 'Error updating entry' });
